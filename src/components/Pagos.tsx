@@ -11,12 +11,17 @@ interface Pago {
   percentage:number;
   date:string;
 }
+let baseId = 1
 function Pagos({totalPrice}:Props) {
   const getDate = () => {
     const date = new Date()
     const day = date.getDate().toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false })
     const month = (date.getMonth()+1).toLocaleString('en-US', { minimumIntegerDigits: 2, useGrouping: false })
     return day+"/"+month+"/"+date.getFullYear()
+  }
+  const generateId = () : number => {
+    baseId++
+    return baseId
   }
   const currency = "USD"
   const [pagos, setPagos] = useState<Pago[]>([{id:1, name:"Anticipo", value:totalPrice, percentage:100 ,date:getDate()}])
@@ -28,28 +33,30 @@ function Pagos({totalPrice}:Props) {
       return [Math.ceil(percentage/2),Math.floor(percentage/2)]
     }
   }
-  const updatePayments = (newPayment:Pago, updatedPayment:Pago) =>{
+  const updatePayments = (position:number, newPayment:Pago, updatedPayment:Pago) =>{
     setPagos(prevPagos => {
-      const updatedPayments = prevPagos.map((pago, index)=>{
+      const newPagos = [...prevPagos]
+      newPagos.splice(position, 0, newPayment)
+      const updatedPayments = newPagos.map((pago, index)=>{
         if (pago.id === updatedPayment.id) {
-          updatedPayment.name = index > 0 ? `Pago ${index}` : `Anticipo`
+          updatedPayment.name = index > 0 ? index < newPagos.length-1 ? `Pago ${index}` : "Pago Final" : `Anticipo`
           return updatedPayment
         }else {
-          pago.name = index > 0 ? `Pago ${index}` : `Anticipo`
+          pago.name = index > 0 ? index < newPagos.length-1 ? `Pago ${index}` : "Pago Final" : `Anticipo`
           return pago
         }
       })
-      return [...updatedPayments, newPayment]
+      return updatedPayments
     })
   }
   const setNewPayment = (index:number) => {
-    const newId = index + 1
+    const newId = generateId()
     const newName = pagos.length < newId ? "Pago Final":`Pago ${newId-1}`
-    const percentages = percentageDivisor(pagos[newId-2].percentage)
+    const percentages = percentageDivisor(pagos[index>0?index-1:index+1].percentage)
     const NewPercentage = percentages[1]
     const newValue = totalPrice * NewPercentage / 100
     const newDate = getDate()
-    const previousPayment = pagos[newId-2]
+    const previousPayment = pagos[index>0?index-1:index+1]
     previousPayment.percentage = percentages[0]
     previousPayment.value = totalPrice * percentages[0] / 100
     const newPayment : Pago = {
@@ -59,18 +66,18 @@ function Pagos({totalPrice}:Props) {
       percentage:NewPercentage, 
       date:newDate
     }
-    updatePayments(newPayment, previousPayment)
+    updatePayments(index, newPayment, previousPayment)
   }
-  const handlerPercentage = (id:number, action:string) => {
+  const handlerPercentage = (position:number, action:string) => {
     setPagos(prevPagos => {
       const updatedPayments = prevPagos.map((pago, index)=>{
         if (action==="+") {
-          switch (pago.id) {
-            case (id>1?id-1:id+1):
+          switch (index) {
+            case (position>0?position-1:position+1):
               pago.percentage -= 1
               pago.value = totalPrice * pago.percentage / 100
               break;
-            case id:
+            case position:
               pago.percentage += 1
               pago.value = totalPrice * pago.percentage / 100
               break
@@ -78,12 +85,12 @@ function Pagos({totalPrice}:Props) {
               break;
           }
         }else {
-          switch (pago.id) {
-            case (id>1?id-1:id+1):
+          switch (index) {
+            case (position>0?position-1:position+1):
               pago.percentage += 1
               pago.value = totalPrice * pago.percentage / 100
               break;
-            case id:
+            case position:
               pago.percentage -= 1
               pago.value = totalPrice * pago.percentage / 100
               break
@@ -119,15 +126,15 @@ function Pagos({totalPrice}:Props) {
           <p className="text-gray-400 text-xl font-normal my-auto">Por Cobrar <span className="text-gray-900 font-semibold">{totalPrice+" "+currency}</span></p>
         </div>
       </div>
-      <div className="w-full h-fit p-6 flex gap-[72px]">
+      <div className="w-full h-fit p-6 pl-7 flex gap-[72px] overflow-x-auto">
         {
           pagos.map((pago, index)=>{
             return (
-              <div key={index} className="flex">
-                <Pago editable={editable} id={pago.id} name={pago.name} value={pago.value} percentage={pago.percentage} date={pago.date} currency={currency} handlerPercentageBus={handlerPercentage}></Pago>
-                <button onClick={()=>{setNewPayment(index+1)}} className="w-12 h-12 border-[3px] border-white rounded-full flex group relative">
-                  <div className="bg-gray-200 absolute h-1 w-full top-1/2 -left-[90%] opacity-0 group-hover:opacity-100 -translate-x-[220%] group-hover:translate-x-[0%] transition duration-300"></div>
-                  <div className="bg-gray-200 w-9 aspect-square rounded-full my-auto mx-auto grid opacity-0 group-hover:opacity-100 -translate-x-[220%] group-hover:translate-x-[0%] transition duration-300">
+              <div key={index} className="w-fit flex">
+                <Pago editable={editable} position={index} name={pago.name} value={pago.value} percentage={pago.percentage} date={pago.date} currency={currency} handlerPercentageBus={handlerPercentage}></Pago>
+                <button onClick={()=>{setNewPayment(index+1)}} className={`w-12 h-12 border-[3px] border-white rounded-full flex group relative ${index===pagos.length-1?"":"ml-[25%]"}`}>
+                  <div className={`bg-gray-200 absolute h-1 w-full top-1/2 -left-[90%] transition ${index===pagos.length-1?"pointer-events-none opacity-0 group-hover:opacity-100 -translate-x-[220%] group-hover:translate-x-[0%] duration-300":"scale-x-[600%] translate-x-[50%] duration-500"}`}></div>
+                  <div className={`bg-gray-200 w-9 aspect-square rounded-full my-auto grid pointer-events-none opacity-0 group-hover:opacity-100 -translate-x-[220%] group-hover:translate-x-[0%] transition duration-300`}>
                     <img src="/src/assets/mediumPlusIcon.png" alt="Plus icon" className="w-[18px] aspect-square m-auto"/>
                   </div>
                 </button>
