@@ -27,7 +27,9 @@ function Pago({editable, position, name, value, percentage, date, currency, hand
   },[name, value, percentage, date])
   return (
     <div className="w-fit h-fit grid gap-y-2 z-20">
-      <div className={`w-12 aspect-square mx-auto border-[3px] ${(editable||position===0)?"bg-gray-50 border-[#FC4024]":"bg-gray-200 border-gray-200"} rounded-full`}></div>
+      <button className={`w-12 aspect-square mx-auto border-[3px] ${(editable)?"bg-gray-50 border-[#FC4024] pointer-events-none":"bg-gray-200 border-gray-200"} rounded-full grid group hover:bg-slate-50 hover:border-[#FC4024] transition`}>
+        <img src="/src/assets/pencilIcon.png" alt="Pencil icon" className="w-5 aspect-square my-auto mx-auto opacity-0 group-hover:opacity-100 transition"/>
+      </button>
       <input 
         type="text"
         disabled={!editable}

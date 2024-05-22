@@ -52,11 +52,11 @@ function Pagos({totalPrice}:Props) {
   const setNewPayment = (index:number) => {
     const newId = generateId()
     const newName = pagos.length < newId ? "Pago Final":`Pago ${newId-1}`
-    const percentages = percentageDivisor(pagos[index>0?index-1:index+1].percentage)
+    const percentages = percentageDivisor(pagos[index>0?index-1:index].percentage)
     const NewPercentage = percentages[1]
     const newValue = totalPrice * NewPercentage / 100
     const newDate = getDate()
-    const previousPayment = pagos[index>0?index-1:index+1]
+    const previousPayment = pagos[index>0?index-1:index]
     previousPayment.percentage = percentages[0]
     previousPayment.value = totalPrice * percentages[0] / 100
     const newPayment : Pago = {
@@ -69,34 +69,58 @@ function Pagos({totalPrice}:Props) {
     updatePayments(index, newPayment, previousPayment)
   }
   const handlerPercentage = (position:number, action:string) => {
+    let minusPercentage:number
+    let plusPercentage:number
+    if (action==="+") {
+      if (position===0) {
+        if (pagos[position+1].percentage - 1 >= 0) {
+          plusPercentage = pagos[position].percentage + 1
+          minusPercentage = pagos[position+1].percentage - 1
+        }else {
+          plusPercentage = pagos[position].percentage
+          minusPercentage = pagos[position+1].percentage
+        }
+      }else {
+        if (pagos[position-1].percentage - 1 >= 0) {
+          plusPercentage = pagos[position].percentage + 1
+          minusPercentage = pagos[position-1].percentage - 1
+        }else {
+          plusPercentage = pagos[position].percentage
+          minusPercentage = pagos[position-1].percentage
+        }
+      }
+    }else {
+      if (position===0) {
+        if (pagos[position].percentage - 1 >= 0) {
+          plusPercentage = pagos[position].percentage - 1
+          minusPercentage = pagos[position+1].percentage + 1
+        }else {
+          plusPercentage = pagos[position].percentage
+          minusPercentage = pagos[position+1].percentage
+        }
+      }else {
+        if (pagos[position].percentage - 1 >= 0) {
+          plusPercentage = pagos[position].percentage - 1
+          minusPercentage = pagos[position-1].percentage + 1
+        }else {
+          plusPercentage = pagos[position].percentage
+          minusPercentage = pagos[position-1].percentage
+        }
+      }
+    }
     setPagos(prevPagos => {
       const updatedPayments = prevPagos.map((pago, index)=>{
-        if (action==="+") {
-          switch (index) {
-            case (position>0?position-1:position+1):
-              pago.percentage -= 1
-              pago.value = totalPrice * pago.percentage / 100
-              break;
-            case position:
-              pago.percentage += 1
-              pago.value = totalPrice * pago.percentage / 100
-              break
-            default:
-              break;
-          }
-        }else {
-          switch (index) {
-            case (position>0?position-1:position+1):
-              pago.percentage += 1
-              pago.value = totalPrice * pago.percentage / 100
-              break;
-            case position:
-              pago.percentage -= 1
-              pago.value = totalPrice * pago.percentage / 100
-              break
-            default:
-              break;
-          }
+        switch (index) {
+          case (position>0?position-1:position+1):
+            pago.percentage = minusPercentage
+            pago.value = totalPrice * pago.percentage / 100
+            break;
+          case position:
+            pago.percentage = plusPercentage
+            pago.value = totalPrice * pago.percentage / 100
+            break
+          default:
+            break;
         }
         return pago
       })
@@ -126,11 +150,17 @@ function Pagos({totalPrice}:Props) {
           <p className="text-gray-400 text-xl font-normal my-auto">Por Cobrar <span className="text-gray-900 font-semibold">{totalPrice+" "+currency}</span></p>
         </div>
       </div>
-      <div className="w-full h-fit p-6 pl-7 flex gap-[72px] overflow-x-auto">
+      <div className="w-full h-fit p-6 pl-4 flex gap-[66px] overflow-x-auto">
         {
           pagos.map((pago, index)=>{
             return (
               <div key={index} className="w-fit flex">
+                <button onClick={()=>{setNewPayment(0)}} className={`w-12 h-12 -mr-4 border-[3px] border-white rounded-full group relative ${index===0?"flex":"hidden"}`}>
+                  <div className={`bg-gray-200 absolute h-1 w-full top-1/2 -right-[50%] pointer-events-none opacity-0 group-hover:opacity-100 translate-x-[220%] group-hover:-translate-x-[0%] transition duration-300`}></div>
+                  <div className={`bg-gray-200 w-9 aspect-square rounded-full my-auto grid pointer-events-none opacity-0 group-hover:opacity-100 translate-x-[220%] group-hover:-translate-x-[0%] transition duration-300`}>
+                    <img src="/src/assets/mediumPlusIcon.png" alt="Plus icon" className="w-[18px] aspect-square m-auto"/>
+                  </div>
+                </button>
                 <Pago editable={editable} position={index} name={pago.name} value={pago.value} percentage={pago.percentage} date={pago.date} currency={currency} handlerPercentageBus={handlerPercentage}></Pago>
                 <button onClick={()=>{setNewPayment(index+1)}} className={`w-12 h-12 border-[3px] border-white rounded-full flex group relative ${index===pagos.length-1?"":"ml-[25%]"}`}>
                   <div className={`bg-gray-200 absolute h-1 w-full top-1/2 -left-[90%] transition ${index===pagos.length-1?"pointer-events-none opacity-0 group-hover:opacity-100 -translate-x-[220%] group-hover:translate-x-[0%] duration-300":"scale-x-[600%] translate-x-[50%] duration-500"}`}></div>
