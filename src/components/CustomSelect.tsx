@@ -22,7 +22,7 @@ function CustomSelect({selectPaymentMethodBus}:Props) {
       <p className="text-gray-600 text-sm font-normal col-span-7">Estado</p>
       <div onClick={()=>{showOptions()}} className="bg-white border border-gray-300 hover:border-[#FF7A66] rounded-[4px] pl-4 pr-2 py-[10px] text-gray-900 text-sm font-normal flex justify-between transition">
         <p>{selectedMethod}</p>
-        <img src="/src/assets/blackDownArrowIcon.png" alt="Down arrow icon" />
+        <img src="/assets/blackDownArrowIcon.png" alt="Down arrow icon" />
       </div>
       <div className="absolute w-[65%] bg-white border-[0.5px] border-gray-300 rounded-[5px] py-4 grid gap-y-2">
         {

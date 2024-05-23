@@ -199,7 +199,7 @@ function Pagos({totalPrice}:Props) {
       <div className="p-6 flex justify-between">
         <div className="h-fit flex my-auto">
           <h1 className="text-[#FF7A66] text-2xl leading-5 font-semibold">Pagos</h1>
-          <img src="/src/assets/downArrowIcon.png" alt="Down arrow icon" className="w-6 aspect-square my-auto"/>
+          <img src="/assets/downArrowIcon.png" alt="Down arrow icon" className="w-6 aspect-square my-auto"/>
         </div>
         <div className="flex gap-6 my-auto">
           <button onClick={()=>{setEditable(!editable)}} className={`h-fit my-auto px-3 py-2 flex rounded-[5px] ${editable?"bg-[#FC4024]":""} transition-colors duration-500`}>
@@ -210,7 +210,7 @@ function Pagos({totalPrice}:Props) {
             ):(
               <>
                 <p className="text-[#FF7A66] text-base leading-5 font-semibold">Editar</p>
-                <img src="/src/assets/pencilIcon.png" alt="Pencil icon" className="w-5 aspect-square my-auto"/>
+                <img src="/assets/pencilIcon.png" alt="Pencil icon" className="w-5 aspect-square my-auto"/>
               </>
             )}
           </button>
@@ -225,7 +225,7 @@ function Pagos({totalPrice}:Props) {
                 <button onClick={()=>{setNewPayment(0)}} className={`w-12 h-12 -mr-4 border-[3px] border-white rounded-full group relative ${index===0?"flex":"hidden"} ${pago.isPaid?"pointer-events-none":""}`}>
                   <div className={`bg-gray-200 absolute h-1 w-full top-1/2 -right-[50%] pointer-events-none opacity-0 group-hover:opacity-100 translate-x-[220%] group-hover:-translate-x-[0%] transition duration-300`}></div>
                   <div className={`bg-gray-200 w-9 aspect-square rounded-full my-auto grid pointer-events-none opacity-0 group-hover:opacity-100 translate-x-[220%] group-hover:-translate-x-[0%] transition duration-300`}>
-                    <img src="/src/assets/mediumPlusIcon.png" alt="Plus icon" className="w-[18px] aspect-square m-auto"/>
+                    <img src="/assets/mediumPlusIcon.png" alt="Plus icon" className="w-[18px] aspect-square m-auto"/>
                   </div>
                 </button>
                 <Pago editable={editable} position={index} pago={pago} currency={currency} isPayable={index===0||pagos[index-1]?.isPaid} handlerPercentageBus={handlerPercentage} completePaymentBus={completePayment} removePaymentBus={removePayment} updateDateBus={updateDate}></Pago>
@@ -239,7 +239,7 @@ function Pagos({totalPrice}:Props) {
                     }
                   </div>
                   <div className={`bg-gray-200 w-9 aspect-square rounded-full my-auto grid pointer-events-none opacity-0 group-hover:opacity-100 -translate-x-[220%] group-hover:translate-x-[0%] transition duration-300`}>
-                    <img src="/src/assets/mediumPlusIcon.png" alt="Plus icon" className="w-[18px] aspect-square m-auto"/>
+                    <img src="/assets/mediumPlusIcon.png" alt="Plus icon" className="w-[18px] aspect-square m-auto"/>
                   </div>
                 </button>
               </div>

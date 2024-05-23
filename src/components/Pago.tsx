@@ -55,9 +55,9 @@ function Pago({editable, position, pago:{id, name, value, percentage, date, isPa
       <button onClick={()=>{showPaymentModal()}} className={`w-12 aspect-square mx-auto border-[3px] ${(editable)?"bg-gray-50 border-[#FC4024] pointer-events-none":isPaid?"bg-green-500 border-green-500 pointer-events-none":isPayable?"bg-gray-200 border-[#FC4024]":"bg-gray-200 border-gray-200 pointer-events-none"} rounded-full grid group hover:bg-slate-50 hover:border-[#FC4024] transition z-10`}>
         {
           isPaid ? (
-            <img src="/src/assets/partyIcon.png" alt="Party Icon" className="w-6 h-6 my-auto mx-auto"/>
+            <img src="/assets/partyIcon.png" alt="Party Icon" className="w-6 h-6 my-auto mx-auto"/>
           ) : (
-            <img src="/src/assets/pencilIcon.png" alt="Pencil icon" className="w-5 aspect-square my-auto mx-auto opacity-0 group-hover:opacity-100 transition"/>
+            <img src="/assets/pencilIcon.png" alt="Pencil icon" className="w-5 aspect-square my-auto mx-auto opacity-0 group-hover:opacity-100 transition"/>
           )
         }
       </button>
@@ -75,11 +75,11 @@ function Pago({editable, position, pago:{id, name, value, percentage, date, isPa
       </div>
       <div className={`mx-auto gap-x-2 ${editable?"flex":"hidden"}`}>
         <button onClick={()=>{handlerPercentageBus(position,"-")}} className="bg-gray-50 w-6 aspect-square rounded-full border-[0.58px] border-[#FF7A66] hover:border-[#FC4024] hover:scale-110 transition duration-200 grid">
-          <img src="/src/assets/minusIcon.png" alt="Minus icon" className="w-3 aspect-square m-auto"/>
+          <img src="/assets/minusIcon.png" alt="Minus icon" className="w-3 aspect-square m-auto"/>
         </button>
         <p className="text-gray-900 text-sm font-normal my-auto">{inputPercentage}%</p>
         <button onClick={()=>{handlerPercentageBus(position,"+")}} className="bg-gray-50 w-6 aspect-square rounded-full border-[0.58px] border-[#FF7A66] hover:border-[#FC4024] hover:scale-110 transition duration-200 grid">
-          <img src="/src/assets/plusIcon.png" alt="Plus icon" className="w-3 aspect-square m-auto"/>
+          <img src="/assets/plusIcon.png" alt="Plus icon" className="w-3 aspect-square m-auto"/>
         </button>
       </div>
       <div className="grid mx-auto">

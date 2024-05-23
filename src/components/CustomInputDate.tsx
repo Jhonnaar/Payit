@@ -17,7 +17,7 @@ function CustomInputDate({currentDate, handlerDateStateBus}:Props) {
   return (
     <div className='relative'>
       <button onClick={handleSelectDate}>
-        <img src="/src/assets/calendarIcon.png" alt="Calendar icon" className="w-4 aspect-square"/>
+        <img src="/assets/calendarIcon.png" alt="Calendar icon" className="w-4 aspect-square"/>
       </button>
       <input 
         type="date"
