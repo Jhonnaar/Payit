@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Pago from "./Pago";
 import { getActualDate } from "../scripts/dateFuntions";
+import { getDataFromLocalStorage, saveDataToLocalStorage } from "../scripts/dbConection";
+import { generateId, getFromCookie } from "../scripts/cookiesConection";
 
 interface Props {
     totalPrice:number;
@@ -14,17 +16,16 @@ export interface Payment {
   isPaid:boolean;
   paymentMethod?:string;
 }
-let baseId = 1
+
 function Pagos({totalPrice}:Props) {
-  const generateId = () : number => {
-    baseId++
-    return baseId
-  }
   const currency = "USD"
-  const [pagos, setPagos] = useState<Payment[]>([{id:1, name:"Anticipo", value:totalPrice, percentage:100 ,date:getActualDate(), isPaid:false}])
+  const [pagos, setPagos] = useState<Payment[]>(getDataFromLocalStorage(totalPrice))
   const [editable, setEditable] = useState<boolean>(false)
   
-  
+  useEffect(()=>{
+    saveDataToLocalStorage(pagos)
+  },[pagos])
+
   const percentageDivisor = (percentage:number):number[] => {
     if (percentage%2===0) {
       return [percentage/2,percentage/2]
