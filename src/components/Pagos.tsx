@@ -202,8 +202,8 @@ function Pagos({totalPrice}:Props) {
           <h1 className="text-[#FF7A66] text-2xl leading-5 font-semibold">Pagos</h1>
           <img src="/assets/downArrowIcon.png" alt="Down arrow icon" className="w-6 aspect-square my-auto"/>
         </div>
-        <div className="flex gap-6 my-auto">
-          <button onClick={()=>{setEditable(!editable)}} className={`h-fit my-auto px-3 py-2 flex rounded-[5px] ${editable?"bg-[#FC4024]":""} transition-colors duration-500`}>
+        <div className="grid md:flex gap-x-6 md:my-auto">
+          <button onClick={()=>{setEditable(!editable)}} className={`w-fit h-fit md:my-auto max-md:justify-self-end px-3 py-2 flex rounded-[5px] ${editable?"bg-[#FC4024]":""} transition-colors duration-500`}>
             {editable ? (
               <>
                 <p className="text-white text-base leading-5 font-semibold">Guardar</p>
@@ -222,7 +222,7 @@ function Pagos({totalPrice}:Props) {
         {
           pagos.map((pago, index)=>{
             return (
-              <div key={index} className="w-fit flex">
+              <div key={index} className="w-fit flex max-md:mx-auto">
                 <button onClick={()=>{setNewPayment(0)}} className={`w-12 h-12 -mr-4 border-[3px] border-white rounded-full group relative ${index===0?"flex":"hidden"} ${pago.isPaid?"pointer-events-none":""}`}>
                   <div className={`bg-gray-200 absolute h-1 w-full top-1/2 -right-[50%] pointer-events-none opacity-0 group-hover:opacity-100 translate-x-[220%] group-hover:-translate-x-[0%] transition duration-300`}></div>
                   <div className={`bg-gray-200 w-9 aspect-square rounded-full my-auto grid pointer-events-none opacity-0 group-hover:opacity-100 translate-x-[220%] group-hover:-translate-x-[0%] transition duration-300`}>

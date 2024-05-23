@@ -24,7 +24,7 @@ function CustomSelect({selectPaymentMethodBus}:Props) {
         <p>{selectedMethod}</p>
         <img src="/assets/blackDownArrowIcon.png" alt="Down arrow icon" />
       </div>
-      <div className="absolute w-[65%] bg-white border-[0.5px] border-gray-300 rounded-[5px] py-4 grid gap-y-2">
+      <div className="absolute w-[85%] md:w-[65%] bg-white border-[0.5px] border-gray-300 rounded-[5px] py-4 grid gap-y-2">
         {
           options.map((option, index)=>{
             return (

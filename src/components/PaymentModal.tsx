@@ -23,7 +23,7 @@ function PaymentModal({savePaymentMethodBus, deletePaymentBus, hidePaymentModalB
   return (
     <div className="absolute w-full h-full top-0 left-0 grid z-30">
       <div onClick={()=>{hidePaymentModalBus()}} className="absolute w-full h-full top-0 left-0 bg-gray-600/35 blur-lg"></div>
-      <div className="relative w-[35%] p-6 bg-white shadow-xl rounded-lg overflow-y-visible m-auto">
+      <div className="relative w-[85%] md:w-[55%] lg:w-[45%] xl:w-[35%] p-6 bg-white shadow-xl rounded-lg overflow-y-visible m-auto">
           <button onClick={()=>{hidePaymentModalBus()}} className="w-fit h-fit absolute right-1 top-1">
             <img src="/assets/exitIcon.png" alt="Exit icon" className="w-5 aspect-square"/>
           </button>
