@@ -4,12 +4,14 @@ import Pago from "./Pago";
 interface Props {
     totalPrice:number;
 }
-interface Pago {
+export interface Payment {
   id:number;
   name:string;
   value:number;
   percentage:number;
   date:string;
+  isPaid:boolean;
+  paymentMethod?:string;
 }
 let baseId = 1
 function Pagos({totalPrice}:Props) {
@@ -24,7 +26,7 @@ function Pagos({totalPrice}:Props) {
     return baseId
   }
   const currency = "USD"
-  const [pagos, setPagos] = useState<Pago[]>([{id:1, name:"Anticipo", value:totalPrice, percentage:100 ,date:getDate()}])
+  const [pagos, setPagos] = useState<Payment[]>([{id:1, name:"Anticipo", value:totalPrice, percentage:100 ,date:getDate(), isPaid:false}])
   const [editable, setEditable] = useState<boolean>(false)
   const percentageDivisor = (percentage:number):number[] => {
     if (percentage%2===0) {
@@ -33,7 +35,8 @@ function Pagos({totalPrice}:Props) {
       return [Math.ceil(percentage/2),Math.floor(percentage/2)]
     }
   }
-  const updatePayments = (position:number, newPayment:Pago, updatedPayment:Pago) =>{
+
+  const updatePayments = (position:number, newPayment:Payment, updatedPayment:Payment) =>{
     setPagos(prevPagos => {
       const newPagos = [...prevPagos]
       newPagos.splice(position, 0, newPayment)
@@ -49,67 +52,77 @@ function Pagos({totalPrice}:Props) {
       return updatedPayments
     })
   }
+
   const setNewPayment = (index:number) => {
     const newId = generateId()
-    const newName = pagos.length < newId ? "Pago Final":`Pago ${newId-1}`
-    const percentages = percentageDivisor(pagos[index>0?index-1:index].percentage)
+    const newName = "Pago final"
+    const previousPayment = index===0?pagos[index]:pagos[index-1].isPaid?pagos[index]:pagos[index-1]
+    const percentages = percentageDivisor(previousPayment.percentage)
     const NewPercentage = percentages[1]
     const newValue = totalPrice * NewPercentage / 100
     const newDate = getDate()
-    const previousPayment = pagos[index>0?index-1:index]
     previousPayment.percentage = percentages[0]
     previousPayment.value = totalPrice * percentages[0] / 100
-    const newPayment : Pago = {
+    const newPayment : Payment = {
       id:newId, 
       name:newName, 
       value:newValue, 
       percentage:NewPercentage, 
-      date:newDate
+      date:newDate,
+      isPaid:false
     }
     updatePayments(index, newPayment, previousPayment)
   }
-  const handlerPercentage = (position:number, action:string) => {
+
+  const getNewPercentages = (position:number, action:string, notPaids:Payment[]) => {
     let minusPercentage:number
     let plusPercentage:number
     if (action==="+") {
       if (position===0) {
-        if (pagos[position+1].percentage - 1 >= 0) {
-          plusPercentage = pagos[position].percentage + 1
-          minusPercentage = pagos[position+1].percentage - 1
+        if (notPaids[position+1].percentage - 1 >= 0) {
+          plusPercentage = notPaids[position].percentage + 1
+          minusPercentage = notPaids[position+1].percentage - 1
         }else {
-          plusPercentage = pagos[position].percentage
-          minusPercentage = pagos[position+1].percentage
+          plusPercentage = notPaids[position].percentage
+          minusPercentage = notPaids[position+1].percentage
         }
       }else {
-        if (pagos[position-1].percentage - 1 >= 0) {
-          plusPercentage = pagos[position].percentage + 1
-          minusPercentage = pagos[position-1].percentage - 1
+        if (notPaids[position-1].percentage - 1 >= 0) {
+          plusPercentage = notPaids[position].percentage + 1
+          minusPercentage = notPaids[position-1].percentage - 1
         }else {
-          plusPercentage = pagos[position].percentage
-          minusPercentage = pagos[position-1].percentage
+          plusPercentage = notPaids[position].percentage
+          minusPercentage = notPaids[position-1].percentage
         }
       }
     }else {
       if (position===0) {
-        if (pagos[position].percentage - 1 >= 0) {
-          plusPercentage = pagos[position].percentage - 1
-          minusPercentage = pagos[position+1].percentage + 1
+        if (notPaids[position].percentage - 1 >= 0) {
+          plusPercentage = notPaids[position].percentage - 1
+          minusPercentage = notPaids[position+1].percentage + 1
         }else {
-          plusPercentage = pagos[position].percentage
-          minusPercentage = pagos[position+1].percentage
+          plusPercentage = notPaids[position].percentage
+          minusPercentage = notPaids[position+1].percentage
         }
       }else {
-        if (pagos[position].percentage - 1 >= 0) {
-          plusPercentage = pagos[position].percentage - 1
-          minusPercentage = pagos[position-1].percentage + 1
+        if (notPaids[position].percentage - 1 >= 0) {
+          plusPercentage = notPaids[position].percentage - 1
+          minusPercentage = notPaids[position-1].percentage + 1
         }else {
-          plusPercentage = pagos[position].percentage
-          minusPercentage = pagos[position-1].percentage
+          plusPercentage = notPaids[position].percentage
+          minusPercentage = notPaids[position-1].percentage
         }
       }
     }
-    setPagos(prevPagos => {
-      const updatedPayments = prevPagos.map((pago, index)=>{
+    return {minusPercentage, plusPercentage}
+  }
+
+  const handlerPercentage = (position:number, action:string) => {
+    const paids = pagos.filter(pago=>pago.isPaid)
+    const notPaids = pagos.filter(pago=>!pago.isPaid)
+    const {minusPercentage, plusPercentage} = getNewPercentages(position-paids.length, action, notPaids)
+    setPagos(() => {
+      const updatedNotPaids = notPaids.map((pago, index)=>{
         switch (index) {
           case (position>0?position-1:position+1):
             pago.percentage = minusPercentage
@@ -124,8 +137,42 @@ function Pagos({totalPrice}:Props) {
         }
         return pago
       })
-      return [...updatedPayments]
+
+      return [...paids, ...updatedNotPaids]
     })
+  }
+
+  const completePayment = (id:number, selectedPaymentMethod:string) => {
+    setPagos(prevPagos => {
+      const updatedPayments = prevPagos.map((pago)=>{
+        if (pago.id === id) {
+          pago.isPaid = true
+          pago.paymentMethod = selectedPaymentMethod
+        }
+        return pago
+      })
+      return updatedPayments
+    })
+  }
+
+  const removePayment = (id:number) => {
+    if (pagos.length>1) {
+      setPagos(prevPagos => {
+        let toUpdatePaymentIndex : number
+        const updatedPayments = prevPagos.filter((pago, index)=>{
+          if (pago.id!==id) {
+            if (toUpdatePaymentIndex===index) {
+              pago.percentage += pagos[index - 1].percentage
+              pago.value = totalPrice * pago.percentage / 100
+            }
+            return pago
+          }else {
+            toUpdatePaymentIndex = index + 1
+          }
+        })
+        return updatedPayments
+      })
+    }
   }
   return (
     <div className="bg-white shadow-sm rounded-lg grid grid-cols-1 divide-y divide-gray-100">
@@ -155,14 +202,14 @@ function Pagos({totalPrice}:Props) {
           pagos.map((pago, index)=>{
             return (
               <div key={index} className="w-fit flex">
-                <button onClick={()=>{setNewPayment(0)}} className={`w-12 h-12 -mr-4 border-[3px] border-white rounded-full group relative ${index===0?"flex":"hidden"}`}>
+                <button onClick={()=>{setNewPayment(0)}} className={`w-12 h-12 -mr-4 border-[3px] border-white rounded-full group relative ${index===0?"flex":"hidden"} ${pago.isPaid?"pointer-events-none":""}`}>
                   <div className={`bg-gray-200 absolute h-1 w-full top-1/2 -right-[50%] pointer-events-none opacity-0 group-hover:opacity-100 translate-x-[220%] group-hover:-translate-x-[0%] transition duration-300`}></div>
                   <div className={`bg-gray-200 w-9 aspect-square rounded-full my-auto grid pointer-events-none opacity-0 group-hover:opacity-100 translate-x-[220%] group-hover:-translate-x-[0%] transition duration-300`}>
                     <img src="/src/assets/mediumPlusIcon.png" alt="Plus icon" className="w-[18px] aspect-square m-auto"/>
                   </div>
                 </button>
-                <Pago editable={editable} position={index} name={pago.name} value={pago.value} percentage={pago.percentage} date={pago.date} currency={currency} handlerPercentageBus={handlerPercentage}></Pago>
-                <button onClick={()=>{setNewPayment(index+1)}} className={`w-12 h-12 border-[3px] border-white rounded-full flex group relative ${index===pagos.length-1?"":"ml-[25%]"}`}>
+                <Pago editable={editable} position={index} pago={pago} currency={currency} isPayable={index===0||pagos[index-1]?.isPaid} handlerPercentageBus={handlerPercentage} completePaymentBus={completePayment} removePaymentBus={removePayment}></Pago>
+                <button onClick={()=>{setNewPayment(index+1)}} className={`w-12 h-12 border-[3px] border-white rounded-full flex group relative ${index===pagos.length-1?"":"ml-[25%]"} ${pago.isPaid?index+1<pagos.length?pagos[index+1].isPaid?"pointer-events-none":"":"pointer-events-none":""}`}>
                   <div className={`bg-gray-200 absolute h-1 w-full top-1/2 -left-[90%] transition ${index===pagos.length-1?"pointer-events-none opacity-0 group-hover:opacity-100 -translate-x-[220%] group-hover:translate-x-[0%] duration-300":"scale-x-[600%] translate-x-[50%] duration-500"}`}></div>
                   <div className={`bg-gray-200 w-9 aspect-square rounded-full my-auto grid pointer-events-none opacity-0 group-hover:opacity-100 -translate-x-[220%] group-hover:translate-x-[0%] transition duration-300`}>
                     <img src="/src/assets/mediumPlusIcon.png" alt="Plus icon" className="w-[18px] aspect-square m-auto"/>

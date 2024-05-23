@@ -1,21 +1,25 @@
 import { useEffect, useState } from "react";
 import CustomInputDate from "./CustomInputDate";
+import type { Payment } from "./Pagos";
+import PaymentModal from "./PaymentModal";
 
 interface Props {
   editable:boolean;
+  pago:Payment;
   position:number;
-  name:string;
-  value:number;
-  percentage:number;
-  date:string;
   currency:string;
+  isPayable:boolean;
   handlerPercentageBus:(position:number, action:string)=>void;
+  completePaymentBus:(id:number, paymentMethod:string)=>void;
+  removePaymentBus:(id:number)=>void;
 }
-function Pago({editable, position, name, value, percentage, date, currency, handlerPercentageBus}:Props) {
+function Pago({editable, position, pago:{id, name, value, percentage, date, isPaid, paymentMethod}, currency, isPayable, handlerPercentageBus, completePaymentBus, removePaymentBus}:Props) {
   const [inputName, setInputName] = useState<string>(name)
   const [inputValue, setInputValue] = useState<number>(value)
   const [inputPercentage, setInputPercentage] = useState<number>(percentage)
   const [inputDate,setInputDate] = useState<string>(date)
+  const [isPaymentModal, setIsPaymentModal] = useState<boolean>(false)
+  editable = !isPaid && editable
   const handlerDateState = (newDate:string) => {
     setInputDate(newDate)
   }
@@ -25,9 +29,27 @@ function Pago({editable, position, name, value, percentage, date, currency, hand
     setInputPercentage(percentage)
     setInputDate(date)
   },[name, value, percentage, date])
+  const savePaymentMethod = (selectedPaymentMethod:string) => {
+    completePaymentBus(id, selectedPaymentMethod)
+  }
+  const deletePayment = () => {
+    removePaymentBus(id)
+  }
+  const hidePaymentModal = () => {
+    setIsPaymentModal(false)
+  }
+  const showPaymentModal = () => {
+    setIsPaymentModal(true)
+  }
+  
   return (
-    <div className="w-fit h-fit grid gap-y-2 z-20">
-      <button className={`w-12 aspect-square mx-auto border-[3px] ${(editable)?"bg-gray-50 border-[#FC4024] pointer-events-none":"bg-gray-200 border-gray-200"} rounded-full grid group hover:bg-slate-50 hover:border-[#FC4024] transition`}>
+    <div className="w-fit h-fit grid gap-y-2">
+      {
+        isPaymentModal && (
+          <PaymentModal savePaymentMethodBus={savePaymentMethod} deletePaymentBus={deletePayment} hidePaymentModalBus={hidePaymentModal}></PaymentModal>
+        )
+      }
+      <button onClick={()=>{showPaymentModal()}} className={`w-12 aspect-square mx-auto border-[3px] ${(editable)?"bg-gray-50 border-[#FC4024] pointer-events-none":isPaid?"bg-green-500 border-green-500 pointer-events-none":isPayable?"bg-gray-200 border-[#FC4024]":"bg-gray-200 border-gray-200 pointer-events-none"} rounded-full grid group hover:bg-slate-50 hover:border-[#FC4024] transition z-10`}>
         <img src="/src/assets/pencilIcon.png" alt="Pencil icon" className="w-5 aspect-square my-auto mx-auto opacity-0 group-hover:opacity-100 transition"/>
       </button>
       <input 
