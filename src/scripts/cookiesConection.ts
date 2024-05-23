@@ -1,3 +1,5 @@
+//Propociona un archivo centralizado para generación y manejo de ids, de facil y claro acceso desde cualquier componente
+//Seleccioné el uso de cookies para mantener el contador de ids al actualizar la página
 
 const setCookie = (key:string, value:number, days:number) => {
   const date = new Date();

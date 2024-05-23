@@ -23,9 +23,14 @@ function Pagos({totalPrice}:Props) {
   const [editable, setEditable] = useState<boolean>(false)
   
   useEffect(()=>{
+    //Ambas peticiones están aquí dado que al iniciar la app, entrará al useEfect al menos una vez y se obtendrían los datos
+    //En el caso de la segunda petición, se llevará a cabo cada vez que se actualice el valor de pagos
+    //@todo:api get para obtener pagos
+    //@todo:api post para guardar pagos
     saveDataToLocalStorage(pagos)
   },[pagos])
 
+  //percentageDivisor grantiza que los porcentages sean enteros
   const percentageDivisor = (percentage:number):number[] => {
     if (percentage%2===0) {
       return [percentage/2,percentage/2]
@@ -72,7 +77,7 @@ function Pagos({totalPrice}:Props) {
     }
     updatePayments(index, newPayment, previousPayment)
   }
-
+  //getNewPercentages necesaria para abarcar todas las posibilidades de los botones "+" y "-"
   const getNewPercentages = (position:number, action:string, notPaids:Payment[]) => {
     let minusPercentage:number
     let plusPercentage:number
@@ -139,6 +144,7 @@ function Pagos({totalPrice}:Props) {
   }
 
   const handlerPercentage = (position:number, action:string) => {
+    //Estos filters me ayudan a garantizar que no se modifiquen los que ya fueron pagados
     const paids = pagos.filter(pago=>pago.isPaid)
     const notPaids = pagos.filter(pago=>!pago.isPaid)
     if (notPaids.length>1) {
@@ -163,7 +169,7 @@ function Pagos({totalPrice}:Props) {
   }
 
   const removePayment = (id:number) => {
-    if (pagos.length>1) {
+    if (pagos.filter(pago=>!pago.isPaid).length>1) {
       setPagos(prevPagos => {
         let toUpdatePaymentIndex : number
         const updatedPayments = prevPagos.filter((pago, index)=>{

@@ -1,4 +1,4 @@
-
+//Propociona un archivo centralizado para el manejo del formato de las fechas, de facil y claro acceso desde cualquier componente
 enum Months {
   Ene = 1,
   Feb,
@@ -21,6 +21,7 @@ const getActualDate = () => {
   return day+"/"+month+"/"+date.getFullYear()
 }
 
+//Es necesario para el formato por defecto del input date
 const formatDate = (date:string) : string => {
   return date.split("/").reverse().join("-")
 }

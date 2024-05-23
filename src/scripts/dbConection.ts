@@ -1,3 +1,5 @@
+//Propociona un archivo centralizado para el manejo del localStorage, de facil y claro acceso desde cualquier componente
+//Decidí usarlo porque se adapta mejor al tipo de datos que necesitaba guardar
 import { Payment } from "../components/Pagos"
 import { getActualDate } from "./dateFuntions"
 
