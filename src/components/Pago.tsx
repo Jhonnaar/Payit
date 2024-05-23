@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import CustomInputDate from "./CustomInputDate";
 import type { Payment } from "./Pagos";
 import PaymentModal from "./PaymentModal";
+import { extendDate } from "../scripts/dateFuntions";
 
 interface Props {
   editable:boolean;
@@ -12,8 +13,9 @@ interface Props {
   handlerPercentageBus:(position:number, action:string)=>void;
   completePaymentBus:(id:number, paymentMethod:string)=>void;
   removePaymentBus:(id:number)=>void;
+  updateDateBus:(id:number, date:string)=>void;
 }
-function Pago({editable, position, pago:{id, name, value, percentage, date, isPaid, paymentMethod}, currency, isPayable, handlerPercentageBus, completePaymentBus, removePaymentBus}:Props) {
+function Pago({editable, position, pago:{id, name, value, percentage, date, isPaid, paymentMethod}, currency, isPayable, handlerPercentageBus, completePaymentBus, removePaymentBus, updateDateBus}:Props) {
   const [inputName, setInputName] = useState<string>(name)
   const [inputValue, setInputValue] = useState<number>(value)
   const [inputPercentage, setInputPercentage] = useState<number>(percentage)
@@ -21,6 +23,7 @@ function Pago({editable, position, pago:{id, name, value, percentage, date, isPa
   const [isPaymentModal, setIsPaymentModal] = useState<boolean>(false)
   editable = !isPaid && editable
   const handlerDateState = (newDate:string) => {
+    updateDateBus(id, newDate)
     setInputDate(newDate)
   }
   useEffect(()=>{
@@ -28,7 +31,7 @@ function Pago({editable, position, pago:{id, name, value, percentage, date, isPa
     setInputValue(value)
     setInputPercentage(percentage)
     setInputDate(date)
-  },[name, value, percentage, date])
+  },[name, value, percentage, date, paymentMethod, isPaid])
   const savePaymentMethod = (selectedPaymentMethod:string) => {
     completePaymentBus(id, selectedPaymentMethod)
   }
@@ -50,7 +53,13 @@ function Pago({editable, position, pago:{id, name, value, percentage, date, isPa
         )
       }
       <button onClick={()=>{showPaymentModal()}} className={`w-12 aspect-square mx-auto border-[3px] ${(editable)?"bg-gray-50 border-[#FC4024] pointer-events-none":isPaid?"bg-green-500 border-green-500 pointer-events-none":isPayable?"bg-gray-200 border-[#FC4024]":"bg-gray-200 border-gray-200 pointer-events-none"} rounded-full grid group hover:bg-slate-50 hover:border-[#FC4024] transition z-10`}>
-        <img src="/src/assets/pencilIcon.png" alt="Pencil icon" className="w-5 aspect-square my-auto mx-auto opacity-0 group-hover:opacity-100 transition"/>
+        {
+          isPaid ? (
+            <img src="/src/assets/partyIcon.png" alt="Party Icon" className="w-6 h-6 my-auto mx-auto"/>
+          ) : (
+            <img src="/src/assets/pencilIcon.png" alt="Pencil icon" className="w-5 aspect-square my-auto mx-auto opacity-0 group-hover:opacity-100 transition"/>
+          )
+        }
       </button>
       <input 
         type="text"
@@ -75,9 +84,9 @@ function Pago({editable, position, pago:{id, name, value, percentage, date, isPa
       </div>
       <div className="grid mx-auto">
         <p hidden={!editable} className="text-gray-400 text-sm font-normal my-auto">Vence</p>
-        <div className="my-auto flex gap-x-2">
+        <div className="max-w-[130px] my-auto flex gap-x-2">
           <div hidden={!editable}><CustomInputDate currentDate={date} handlerDateStateBus={handlerDateState}></CustomInputDate></div>
-          <p className="text-gray-900 text-sm font-normal">{inputDate}</p>
+          <p className={`text-gray-900 text-sm font-normal text-center ${isPaid&&"text-green-600"}`}><span hidden={!isPaid}>Pagado </span>{editable?inputDate:extendDate(inputDate)} <span hidden={!isPaid}>con {paymentMethod}</span></p>
         </div>
       </div>
     </div>

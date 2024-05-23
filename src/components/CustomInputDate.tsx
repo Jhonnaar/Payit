@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { formatDate, unFormatDate } from '../scripts/dateFuntions';
 
 interface Props {
   currentDate:string;
@@ -11,12 +12,6 @@ function CustomInputDate({currentDate, handlerDateStateBus}:Props) {
     if (dateInputRef.current) {
       dateInputRef.current.showPicker()
     }
-  }
-  const formatDate = (date:string):string => {
-    return date.split("/").reverse().join("-")
-  }
-  const unFormatDate = (date:string):string => {
-    return date.split("-").reverse().join("/")
   }
 
   return (
