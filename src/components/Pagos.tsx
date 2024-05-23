@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Pago from "./Pago";
 import { getActualDate } from "../scripts/dateFuntions";
 import { getDataFromLocalStorage, saveDataToLocalStorage } from "../scripts/dbConection";
-import { generateId, getFromCookie } from "../scripts/cookiesConection";
+import { generateId } from "../scripts/cookiesConection";
 
 interface Props {
     totalPrice:number;
